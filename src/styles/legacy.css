@@ -1,0 +1,317 @@
+/* ==========================================================================
+   CAPA DE COMPATIBILIDAD
+
+   Las paginas que aun no migraron al sistema nuevo usan estas clases.
+   En lugar de romperlas, se redefinen con el lenguaje Liquid Editorial:
+   cualquier vista antigua se ve premium sin tocar su JSX.
+
+   Se puede borrar cuando las ultimas vistas esten migradas.
+   ========================================================================== */
+
+/* Contenedores heredados */
+.form-shell,
+.process-hero,
+.detail-hero {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  padding: calc(var(--header-h) + clamp(3rem, 8vh, 6rem)) var(--gutter) clamp(3rem, 8vh, 6rem);
+}
+
+.process-hero,
+.detail-hero { max-width: var(--shell-max); }
+
+.form-shell h1,
+.process-hero h1,
+.detail-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--fg, var(--ink-invert));
+  margin-block: 0.7rem 0.9rem;
+}
+
+/* Titulares generales */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.06;
+  color: var(--fg, var(--ink-invert));
+}
+
+h2 { font-size: clamp(1.8rem, 4vw, 3.1rem); text-transform: uppercase; }
+h3 { font-size: clamp(1.15rem, 2.2vw, 1.55rem); }
+h4 { font-size: 1.05rem; }
+
+p { color: var(--fg-soft, var(--ink-invert-soft)); }
+
+/* .muted y .eyebrow siguen existiendo en vistas antiguas */
+.muted { color: var(--fg-faint, var(--ink-invert-faint)); }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-ui);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent, var(--bdp-cyan));
+}
+
+.eyebrow::before {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.65;
+}
+
+/* Tarjeta heredada -> vidrio */
+.card,
+.form-card,
+.aside-card,
+.filters {
+  position: relative;
+  isolation: isolate;
+  padding: clamp(1.3rem, 3vw, 2rem);
+  border-radius: var(--r-lg);
+  background: var(--pane, var(--glass-tint));
+  border: 1px solid var(--pane-rim, var(--glass-rim));
+  box-shadow: var(--pane-shadow, var(--glass-shadow));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  transition: background var(--dur-base) var(--ease-glass), border-color var(--dur-base) var(--ease-glass), box-shadow var(--dur-base) var(--ease-glass), transform var(--dur-base) var(--ease-out-quint);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: var(--glass-shadow-lift);
+}
+
+/* Botones heredados */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--r-pill);
+  background: var(--bdp-cyan);
+  color: var(--canvas-night);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color var(--dur-base) var(--ease-glass), box-shadow var(--dur-base) var(--ease-glass), transform var(--dur-fast) var(--ease-out-quint);
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, var(--bdp-navy), var(--bdp-cyan));
+  transform: translateY(101%);
+  transition: transform var(--dur-base) var(--ease-glass);
+}
+
+.button:hover::before { transform: translateY(0); }
+.button:hover { color: #fff; box-shadow: 0 18px 44px -18px rgba(0, 176, 216, 0.7); }
+.button:active { transform: scale(0.975); }
+
+.button.primary { background: var(--bdp-cyan); color: var(--canvas-night); }
+
+.button.secondary {
+  background: transparent;
+  color: var(--fg, var(--ink-invert));
+  border: 1px solid var(--pane-rim, var(--glass-rim));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.button.secondary:hover { color: #fff; }
+
+/* Etiqueta heredada */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--r-pill);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Rejillas heredadas */
+.grid,
+.feature-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1.1rem;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Campos de formulario heredados */
+.field {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.field.full { grid-column: 1 / -1; }
+
+.field > span,
+.field > label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-faint, var(--ink-invert-faint));
+}
+
+.field input,
+.field textarea,
+.field select,
+.filters input,
+.filters select {
+  width: 100%;
+  padding: 0.85rem 1.05rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--pane-rim, var(--glass-rim));
+  background: color-mix(in srgb, var(--fg, #fff) 4%, transparent);
+  color: var(--fg, var(--ink-invert));
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-glass), box-shadow var(--dur-fast) var(--ease-glass), background var(--dur-fast) var(--ease-glass);
+}
+
+.field input::placeholder,
+.field textarea::placeholder { color: var(--fg-faint); }
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus,
+.filters input:focus,
+.filters select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.field select option { background: var(--canvas-night); color: var(--ink-invert); }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 0 1rem;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-block: 1rem;
+  font-size: 0.86rem;
+  color: var(--fg-soft, var(--ink-invert-soft));
+}
+
+.check input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  accent-color: var(--bdp-cyan);
+}
+
+/* Aviso heredado */
+.notice {
+  padding: 1rem 1.2rem;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255, 180, 85, 0.35);
+  background: rgba(255, 180, 85, 0.1);
+  color: #ffc478;
+  font-size: 0.86rem;
+  margin-block: 1rem;
+}
+
+/* Disposiciones heredadas */
+.process-layout,
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 4vw, 2.6rem);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .process-layout { grid-template-columns: 290px 1fr; }
+  .detail-grid { grid-template-columns: 2fr 1fr; }
+}
+
+@media (min-width: 960px) {
+  .filters,
+  .aside-card {
+    position: sticky;
+    top: calc(var(--header-h) + 1.2rem);
+  }
+}
+
+.detail-grid li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-block: 0.65rem;
+  color: var(--fg-soft, var(--ink-invert-soft));
+}
+
+.detail-grid li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 8px;
+  height: 1px;
+  background: var(--accent);
+}
+
+/* Restos del rediseno anterior que ya no aplican */
+.orbital,
+.orbital-card,
+.atmosphere-panel,
+.motion-canvas,
+.scroll-progress,
+.stats-row,
+.section-divider,
+.cta-section::before { display: none; }
+
+.large-text { font-size: 19px; }
+
+/* Acciones heredadas */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-block: 1.6rem;
+}
