@@ -1,0 +1,586 @@
+/* ==========================================================================
+   ESTRUCTURA (chrome de la aplicacion)
+   ========================================================================== */
+
+.app-root {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+}
+
+/* --------------------------------------------------------------------------
+   Lienzo WebGL de fondo. Vive fijo detras de todo y nunca captura eventos.
+   -------------------------------------------------------------------------- */
+
+.liquid-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Grano sutil: rompe el banding de los degradados y da textura de papel */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   PRELOADER  -  "Trabaja en BDP S.A.M."
+   Corto, elegante y con salida en cortina. Nunca supera 2.6 s.
+   -------------------------------------------------------------------------- */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-preloader);
+  display: grid;
+  place-items: center;
+  background: var(--canvas-abyss);
+  overflow: hidden;
+}
+
+.preloader__aura {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle at 50% 55%, rgba(0, 176, 216, 0.16), transparent 55%), radial-gradient(circle at 30% 20%, rgba(0, 66, 130, 0.28), transparent 60%);
+  opacity: 0;
+}
+
+.preloader__stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 1.9rem;
+  text-align: center;
+  padding-inline: 1.5rem;
+}
+
+.preloader__logo {
+  width: clamp(150px, 22vw, 250px);
+  opacity: 0;
+}
+
+.preloader__logo path { fill: #fff; }
+
+/* Cada palabra del titular entra por separado */
+.preloader__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4.2vw, 3rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-invert);
+  line-height: 1.1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.3em;
+}
+
+.preloader__word {
+  display: inline-block;
+  opacity: 0;
+}
+
+.preloader__title em {
+  font-family: var(--font-script);
+  font-style: normal;
+  text-transform: none;
+  font-size: 1.35em;
+  line-height: 0.8;
+  color: var(--bdp-cyan-soft);
+}
+
+.preloader__rule {
+  width: min(260px, 60vw);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.preloader__rule span {
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--bdp-navy), var(--bdp-cyan));
+}
+
+.preloader__meta {
+  font-size: 0.6rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(242, 247, 251, 0.4);
+  opacity: 0;
+}
+
+/* Cortina de salida: dos paneles que se abren en vertical */
+.preloader__curtain {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50.5%;
+  background: var(--canvas-abyss);
+  z-index: 2;
+}
+
+.preloader__curtain--top { top: 0; }
+.preloader__curtain--bottom { bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   TRANSICION ENTRE RUTAS  -  el arco de ERA.
+   Un panel crema con borde superior en arco que barre la pantalla.
+   -------------------------------------------------------------------------- */
+
+.route-veil {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  background: var(--canvas-cream);
+  border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+  transform: translateY(100%);
+}
+
+.route-veil__mark {
+  width: 92px;
+  opacity: 0;
+}
+
+.route-veil__mark path { fill: var(--bdp-navy); }
+
+/* --------------------------------------------------------------------------
+   CABECERA
+   Fija, minima, tres columnas: marca / navegacion / utilidades.
+   Se oculta al bajar y reaparece al subir.
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  transition: transform var(--dur-base) var(--ease-out-expo), background var(--dur-base) linear, backdrop-filter var(--dur-base) linear;
+}
+
+.site-header[data-pinned='false'] { transform: translateY(-100%); }
+
+.site-header[data-scrolled='true'] {
+  background: color-mix(in srgb, var(--canvas-abyss) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Sobre secciones claras la cabecera invierte su tinta */
+.site-header[data-over='light'] { color: var(--ink-strong); }
+.site-header[data-over='dark'] { color: var(--ink-invert); }
+
+.site-header__inner {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.site-header__brand svg { width: 92px; height: auto; }
+
+.site-header__brand-text {
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.72;
+  max-width: 12ch;
+  line-height: 1.35;
+}
+
+.site-header__nav {
+  display: flex;
+  justify-content: center;
+  gap: clamp(1rem, 2.4vw, 2.4rem);
+}
+
+.site-header__nav a {
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  opacity: 0.78;
+  transition: opacity var(--dur-fast) var(--ease-glass);
+}
+
+.site-header__nav a:hover,
+.site-header__nav a[aria-current='page'] { opacity: 1; }
+
+.site-header__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: end;
+}
+
+/* Bloque derecho tipo ERA: acciones apiladas en versalitas diminutas */
+.header-actions {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.header-actions a {
+  font-size: 0.57rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.header-actions a:first-child {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  opacity: 1;
+}
+
+.header-actions a:hover { opacity: 1; }
+
+@media (min-width: 1024px) { .header-actions { display: flex; } }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--pane-rim, rgba(255, 255, 255, 0.16));
+  color: currentColor;
+  transition: all var(--dur-fast) var(--ease-glass);
+}
+
+.icon-btn:hover {
+  border-color: var(--bdp-cyan);
+  color: var(--bdp-cyan);
+  transform: translateY(-2px);
+}
+
+.icon-btn svg { width: 17px; height: 17px; }
+
+.icon-btn__badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 17px;
+  height: 17px;
+  padding-inline: 4px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  background: var(--bdp-cyan);
+  color: var(--canvas-night);
+  font-size: 0.55rem;
+  font-weight: 800;
+}
+
+.icon-btn-wrap { position: relative; display: inline-flex; }
+
+/* --------------------------------------------------------------------------
+   RIEL IZQUIERDO  -  sello, contador y guia de scroll.
+   Es el elemento que mas identidad le da a ERA y el que mejor traduce
+   la idea de "progreso de lectura" a un portal de convocatorias.
+   -------------------------------------------------------------------------- */
+
+.scroll-rail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--rail);
+  z-index: var(--z-rail);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1.35rem 2.2rem;
+  pointer-events: none;
+  color: var(--fg, var(--ink-invert));
+  mix-blend-mode: difference;
+}
+
+@media (min-width: 1100px) { .scroll-rail { display: flex; } }
+
+.scroll-rail > * { pointer-events: auto; }
+
+/* Sello circular rotatorio */
+.seal {
+  position: relative;
+  width: clamp(62px, 5.2vw, 84px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.seal__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.seal--spin .seal__ring {
+  animation: seal-spin 26s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes seal-spin { to { transform: rotate(360deg); } }
+
+.seal__ring text {
+  font-family: var(--font-ui);
+  font-size: 8.4px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  fill: currentColor;
+}
+
+.seal__mark {
+  position: relative;
+  width: 46%;
+}
+
+.seal__mark path { fill: currentColor; }
+
+.seal:hover .seal__ring { animation-duration: 8s; }
+
+/* Contador central 00 -> 100, con filete propio */
+.rail-counter {
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+}
+
+.rail-counter__line {
+  width: 1px;
+  height: clamp(48px, 9vh, 90px);
+  background: currentColor;
+  opacity: 0.24;
+  position: relative;
+  overflow: hidden;
+}
+
+.rail-counter__line span {
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  transform-origin: top;
+  transform: scaleY(var(--progress, 0));
+}
+
+.rail-counter__value {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* Guia inferior: SCROLL / IR ARRIBA */
+.rail-scroll {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  background: none;
+}
+
+.rail-scroll__text {
+  writing-mode: vertical-rl;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.rail-scroll__arrow {
+  width: 1px;
+  height: clamp(40px, 7vh, 74px);
+  background: currentColor;
+  opacity: 0.3;
+  position: relative;
+}
+
+/* Un punto que recorre la linea en bucle: el latido de la pagina */
+.rail-scroll__arrow::after {
+  content: '';
+  position: absolute;
+  left: -1.5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: rail-drop 2.6s var(--ease-in-out-quart) infinite;
+}
+
+@keyframes rail-drop {
+  0% { top: 0; opacity: 0; }
+  22% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.rail-scroll[data-mode='top'] .rail-scroll__arrow::after {
+  animation-direction: reverse;
+}
+
+/* --------------------------------------------------------------------------
+   PIE DE PAGINA  -  bloque ciruela con el telefono monumental.
+   -------------------------------------------------------------------------- */
+
+.site-footer {
+  position: relative;
+  padding-block: clamp(4.5rem, 10vh, 8rem) 2.5rem;
+  overflow: hidden;
+}
+
+.site-footer__mark {
+  width: 58px;
+  margin-inline: auto;
+  margin-bottom: 2rem;
+}
+
+.site-footer__mark path { fill: var(--ink-invert); }
+
+.site-footer__phone {
+  display: block;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8.5vw, 6.2rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink-invert);
+  line-height: 1;
+  transition: color var(--dur-base) var(--ease-glass);
+}
+
+.site-footer__phone:hover { color: var(--bdp-cyan-soft); }
+
+.site-footer__office {
+  margin-top: 1.5rem;
+  text-align: center;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.site-footer__grid {
+  margin-top: clamp(3rem, 7vh, 5.5rem);
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 2rem;
+}
+
+.site-footer__col {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+}
+
+.site-footer__col a {
+  font-size: 0.78rem;
+  color: var(--ink-invert-soft);
+  transition: color var(--dur-fast) var(--ease-glass);
+  justify-self: start;
+}
+
+.site-footer__col a:hover { color: var(--bdp-cyan-soft); }
+
+.site-footer__legal {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   AVISO DE COOKIES  -  tarjeta editorial con script gigante, como ERA.
+   -------------------------------------------------------------------------- */
+
+.cookie-card {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: clamp(1rem, 3vw, 2.5rem);
+  z-index: var(--z-overlay);
+  width: min(340px, calc(100vw - 2rem));
+  padding: 2.4rem 1.9rem 1.9rem;
+  background: var(--canvas-cream);
+  color: var(--ink-strong);
+  border-radius: var(--r-md);
+  box-shadow: 0 40px 90px -30px rgba(2, 10, 18, 0.7);
+  overflow: hidden;
+}
+
+.cookie-card__script {
+  font-family: var(--font-script);
+  font-size: clamp(3rem, 8vw, 4.6rem);
+  line-height: 0.85;
+  color: var(--bdp-navy);
+  margin-bottom: 0.9rem;
+  white-space: nowrap;
+}
+
+.cookie-card p {
+  font-size: 0.74rem;
+  line-height: 1.7;
+  color: var(--ink-body);
+  letter-spacing: 0.02em;
+}
+
+.cookie-card__actions {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.cookie-card__actions button {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-strong);
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+  transition: color var(--dur-fast) var(--ease-glass);
+}
+
+.cookie-card__actions button:hover { color: var(--bdp-cyan); }
+
+.cookie-card__actions span { opacity: 0.3; }
