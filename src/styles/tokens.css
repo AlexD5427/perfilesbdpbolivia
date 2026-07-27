@@ -1,0 +1,131 @@
+/* ==========================================================================
+   TOKENS
+   Unica fuente de verdad para color, espacio, tipografia y movimiento.
+   ========================================================================== */
+
+:root {
+  /* ---- Marca BDP (extraidos del SVG oficial) ---------------------------- */
+  --bdp-navy: #004282;
+  --bdp-cyan: #00b0d8;
+  --bdp-navy-deep: #002b56;
+  --bdp-cyan-soft: #6fd4ec;
+
+  /* ---- Lienzos editoriales (ritmo de secciones tipo ERA) ---------------- */
+  --canvas-night: #04121f;
+  --canvas-abyss: #020a12;
+  --canvas-powder: #cfe2ee;
+  --canvas-cream: #f4f2ea;
+  --canvas-plum: #1b0d28;
+
+  /* ---- Tinta ------------------------------------------------------------ */
+  --ink-strong: #04121f;
+  --ink-body: #274257;
+  --ink-soft: #5b7a91;
+  --ink-invert: #f2f7fb;
+  --ink-invert-soft: #a9c2d4;
+  --ink-invert-faint: rgba(242, 247, 251, 0.42);
+
+  /* ---- Vidrio liquido --------------------------------------------------- */
+  --glass-tint: rgba(255, 255, 255, 0.045);
+  --glass-tint-hover: rgba(255, 255, 255, 0.085);
+  --glass-tint-strong: rgba(255, 255, 255, 0.13);
+  --glass-rim: rgba(255, 255, 255, 0.14);
+  --glass-rim-hot: rgba(111, 212, 236, 0.55);
+  --glass-blur: 22px;
+  --glass-blur-deep: 44px;
+  --glass-sat: 165%;
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.09) inset, 0 -1px 0 rgba(0, 0, 0, 0.22) inset, 0 28px 70px -30px rgba(2, 10, 18, 0.85);
+  --glass-shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.16) inset, 0 -1px 0 rgba(0, 0, 0, 0.24) inset, 0 44px 110px -34px rgba(0, 176, 216, 0.28), 0 30px 80px -36px rgba(2, 10, 18, 0.9);
+
+  /* Vidrio sobre lienzos claros (invierte la logica de luz) */
+  --glass-tint-light: rgba(255, 255, 255, 0.5);
+  --glass-rim-light: rgba(4, 18, 31, 0.1);
+  --glass-shadow-light: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 24px 60px -34px rgba(4, 18, 31, 0.4);
+
+  /* ---- Tipografia -------------------------------------------------------- */
+  --font-display: var(--font-bodoni), 'Didot', 'Bodoni MT', Georgia, serif;
+  --font-script: var(--font-pinyon), 'Snell Roundhand', cursive;
+  --font-ui: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --tracking-label: 0.24em;
+  --tracking-display: -0.035em;
+  --leading-display: 0.86;
+
+  /* ---- Espacio ----------------------------------------------------------- */
+  --shell-max: 1320px;
+  --gutter: clamp(1.25rem, 3.2vw, 3.5rem);
+  --rail: clamp(3rem, 6vw, 6.5rem);
+  --header-h: 84px;
+  --section-y: clamp(6rem, 13vh, 11rem);
+
+  /* ---- Radios ------------------------------------------------------------ */
+  --r-sm: 10px;
+  --r-md: 18px;
+  --r-lg: 28px;
+  --r-xl: 40px;
+  --r-pill: 999px;
+
+  /* ---- Movimiento --------------------------------------------------------
+     ERA se mueve con curvas muy largas y salidas suaves. Nada rebota:
+     todo se desliza y se asienta. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-glass: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --dur-fast: 0.28s;
+  --dur-base: 0.55s;
+  --dur-slow: 0.9s;
+  --dur-cinematic: 1.4s;
+
+  /* ---- Capas ------------------------------------------------------------- */
+  --z-canvas: 0;
+  --z-content: 10;
+  --z-rail: 40;
+  --z-header: 60;
+  --z-dock: 70;
+  --z-overlay: 80;
+  --z-palette: 90;
+  --z-preloader: 100;
+
+  color-scheme: dark;
+  font-size: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Contexto de seccion.
+   Cada seccion declara su lienzo y los tokens de tinta/vidrio se invierten
+   solos. Asi una misma tarjeta funciona sobre noche, polvo o crema.
+   -------------------------------------------------------------------------- */
+
+[data-canvas='night'],
+[data-canvas='plum'] {
+  --fg: var(--ink-invert);
+  --fg-soft: var(--ink-invert-soft);
+  --fg-faint: var(--ink-invert-faint);
+  --pane: var(--glass-tint);
+  --pane-hover: var(--glass-tint-hover);
+  --pane-rim: var(--glass-rim);
+  --pane-shadow: var(--glass-shadow);
+  --hairline: rgba(255, 255, 255, 0.12);
+  --accent: var(--bdp-cyan);
+}
+
+[data-canvas='night'] { background-color: var(--canvas-night); }
+[data-canvas='plum'] { background-color: var(--canvas-plum); }
+
+[data-canvas='powder'],
+[data-canvas='cream'] {
+  --fg: var(--ink-strong);
+  --fg-soft: var(--ink-body);
+  --fg-faint: var(--ink-soft);
+  --pane: var(--glass-tint-light);
+  --pane-hover: rgba(255, 255, 255, 0.72);
+  --pane-rim: var(--glass-rim-light);
+  --pane-shadow: var(--glass-shadow-light);
+  --hairline: rgba(4, 18, 31, 0.14);
+  --accent: var(--bdp-navy);
+}
+
+[data-canvas='powder'] { background-color: var(--canvas-powder); }
+[data-canvas='cream'] { background-color: var(--canvas-cream); }
