@@ -1,0 +1,685 @@
+/* ==========================================================================
+   SECCIONES EDITORIALES
+
+   El ritmo de ERA es: noche -> polvo -> crema -> imagen -> polvo -> noche ->
+   arco crema -> ciruela. Cada cambio de lienzo es una respiracion.
+   ========================================================================== */
+
+.section {
+  position: relative;
+  padding-block: var(--section-y);
+  overflow: clip;
+}
+
+.section--flush { padding-block: 0; }
+.section--tight { padding-block: clamp(3.5rem, 7vh, 6rem); }
+
+.section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+
+.section__head-title { display: grid; gap: 0.9rem; }
+
+/* --------------------------------------------------------------------------
+   ORNAMENTOS
+   ERA usa buganvillas recortadas que invaden la grilla. Aqui usamos
+   geometria textil andina en SVG: mismo gesto, identidad correcta.
+   -------------------------------------------------------------------------- */
+
+.ornament {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+  will-change: transform;
+}
+
+.ornament--tl { top: -6%; left: -5%; width: clamp(180px, 26vw, 400px); }
+.ornament--tr { top: -8%; right: -6%; width: clamp(160px, 22vw, 340px); }
+.ornament--bl { bottom: -8%; left: -7%; width: clamp(200px, 28vw, 420px); }
+.ornament--br { bottom: -6%; right: -5%; width: clamp(180px, 24vw, 360px); }
+
+.ornament--faint { opacity: 0.2; }
+
+/* --------------------------------------------------------------------------
+   HEROE
+   Titular monumental centrado, script superpuesto, texto partido a los
+   flancos y un conmutador dia/noche que cambia el clima del fondo.
+   -------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero__sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: opacity var(--dur-cinematic) var(--ease-in-out-quart);
+}
+
+.hero__sky--day {
+  background: linear-gradient(178deg, #0a4d8c 0%, #0f6ba8 38%, #2f9ec9 68%, #a9d8e8 100%);
+}
+
+.hero__sky--night {
+  background: linear-gradient(178deg, #02070f 0%, #051a30 40%, #063352 72%, #0a4b73 100%);
+}
+
+.hero[data-mood='dia'] .hero__sky--night { opacity: 0; }
+.hero[data-mood='noche'] .hero__sky--day { opacity: 0; }
+
+/* Vineteado que asienta el titular sobre el cielo */
+.hero__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse 90% 70% at 50% 40%, transparent 30%, rgba(2, 8, 16, 0.55) 100%);
+}
+
+/* Silueta de cordillera: ancla la pieza en Bolivia sin usar fotos */
+.hero__range {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  padding-block: calc(var(--header-h) + 3rem) clamp(5rem, 12vh, 9rem);
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.hero__title { position: relative; display: grid; justify-items: center; }
+
+.hero__title .display { color: #fff; }
+
+/* El script se solapa con la base del titular, como "Estepona" en ERA */
+.hero__script {
+  color: #fff;
+  margin-top: -0.34em;
+  margin-left: 0.18em;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 10px 40px rgba(2, 10, 20, 0.35);
+}
+
+/* Conmutador dia / noche */
+.hero__mood {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-top: 0.6rem;
+}
+
+.hero__mood button {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  transition: color var(--dur-base) var(--ease-glass);
+}
+
+.hero__mood button[aria-pressed='true'] { color: #fff; }
+
+/* Texto partido a los flancos: A PLACE ... TO RETURN TO */
+.hero__flanks {
+  position: absolute;
+  inset-inline: clamp(1.5rem, 8vw, 8rem);
+  top: 58%;
+  z-index: 6;
+  display: none;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+@media (min-width: 900px) { .hero__flanks { display: flex; } }
+
+.hero__flank {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.1vw, 1.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: #fff;
+  opacity: 0.92;
+}
+
+.hero__cta {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(2rem, 6vh, 4.5rem);
+  transform: translateX(-50%);
+  z-index: 7;
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   CARRUSEL VINCULADO
+   Titular + imagen + descripcion cambian juntos. La paginacion de ERA es
+   `< 1 ——— 2 >` con un filete que se llena.
+   -------------------------------------------------------------------------- */
+
+.linked-carousel { position: relative; }
+
+.linked-carousel__title {
+  text-align: center;
+  min-height: 1.05em;
+  margin-bottom: clamp(2rem, 6vh, 4rem);
+}
+
+.linked-carousel__stage {
+  position: relative;
+  width: min(100%, 640px);
+  margin-inline: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--canvas-night);
+}
+
+.linked-carousel__stage--portrait {
+  aspect-ratio: 3 / 4;
+  width: min(100%, 420px);
+}
+
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: transform, clip-path;
+}
+
+.carousel-slide[data-active='true'] { opacity: 1; }
+
+/* --------------------------------------------------------------------------
+   PAGINACION EDITORIAL
+   -------------------------------------------------------------------------- */
+
+.pager {
+  margin-top: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+}
+
+.pager__arrow {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: var(--fg-soft);
+  transition: color var(--dur-fast) var(--ease-glass), transform var(--dur-fast) var(--ease-out-quint);
+}
+
+.pager__arrow:hover { color: var(--accent); }
+.pager__arrow:first-child:hover { transform: translateX(-3px); }
+.pager__arrow:last-child:hover { transform: translateX(3px); }
+
+.pager__num {
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-soft);
+  min-width: 1.4ch;
+  text-align: center;
+}
+
+.pager__track {
+  position: relative;
+  width: clamp(90px, 14vw, 150px);
+  height: 1px;
+  background: var(--hairline);
+}
+
+.pager__track span {
+  position: absolute;
+  inset: 0;
+  background: var(--fg);
+  transform-origin: left;
+  transform: scaleX(var(--pager, 0));
+  transition: transform var(--dur-slow) var(--ease-out-expo);
+}
+
+/* --------------------------------------------------------------------------
+   TARJETA DE CONVOCATORIA EDITORIAL
+   Adaptacion directa de la ficha de tipologia de ERA: metadatos a la
+   izquierda, imagen al centro, descripcion y accion a la derecha, y el
+   titulo gigante montado sobre la base de la imagen.
+   -------------------------------------------------------------------------- */
+
+.spread {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 980px) {
+  .spread { grid-template-columns: 1fr auto 1fr; }
+}
+
+.spread__meta {
+  display: grid;
+  gap: 1.6rem;
+  align-content: center;
+}
+
+@media (min-width: 980px) { .spread__meta { justify-items: end; text-align: right; } }
+
+.spread__stat { display: grid; gap: 0.2rem; }
+
+.spread__stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.4vw, 2.9rem);
+  line-height: 1;
+  color: var(--fg);
+}
+
+.spread__visual { position: relative; }
+
+.spread__title {
+  position: absolute;
+  left: 50%;
+  bottom: -0.32em;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 92vw;
+  z-index: 3;
+  pointer-events: none;
+  text-align: center;
+}
+
+.spread__aside { display: grid; gap: 1.4rem; align-content: center; }
+
+/* --------------------------------------------------------------------------
+   TABS CON BARRIDO DIAGONAL
+   La seccion de amenities de ERA. Al cambiar de pestana, la nueva escena
+   entra con un corte inclinado que barre la anterior.
+   -------------------------------------------------------------------------- */
+
+.wipe-tabs {
+  position: relative;
+  min-height: clamp(560px, 88vh, 900px);
+  display: grid;
+  overflow: hidden;
+}
+
+.wipe-tabs__scenes { position: absolute; inset: 0; z-index: 0; }
+
+.wipe-scene {
+  position: absolute;
+  inset: 0;
+  /* Estado por defecto: fuera de plano, cortado en diagonal */
+  clip-path: polygon(0 0, 0 0, -14% 100%, -14% 100%);
+  will-change: clip-path;
+}
+
+.wipe-scene[data-active='true'] {
+  clip-path: polygon(0 0, 114% 0, 100% 100%, 0 100%);
+}
+
+.wipe-scene__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(2, 10, 18, 0.82) 0%, rgba(2, 10, 18, 0.42) 45%, rgba(2, 10, 18, 0.72) 100%);
+}
+
+.wipe-tabs__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  align-content: space-between;
+  gap: 2rem;
+  padding-block: clamp(3rem, 8vh, 6rem);
+}
+
+.wipe-tabs__list {
+  justify-self: end;
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 1.1rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  position: relative;
+}
+
+/* Indicador que se desliza junto al item activo */
+.wipe-tabs__marker {
+  position: absolute;
+  left: -1px;
+  width: 1px;
+  background: #fff;
+  transition: transform var(--dur-base) var(--ease-out-expo), height var(--dur-base) var(--ease-out-expo);
+}
+
+.wipe-tabs__tab {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.5vw, 2.05rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.28;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.34);
+  transition: color var(--dur-base) var(--ease-glass), transform var(--dur-base) var(--ease-out-quint);
+}
+
+.wipe-tabs__tab:hover { color: rgba(255, 255, 255, 0.68); transform: translateX(-4px); }
+.wipe-tabs__tab[aria-selected='true'] { color: #fff; }
+
+.wipe-tabs__panel { max-width: 44ch; color: #fff; }
+
+.wipe-tabs__panel-label {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 0.9rem;
+}
+
+.wipe-tabs__panel-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.4vw, 1.95rem);
+  text-transform: uppercase;
+  line-height: 1.24;
+  letter-spacing: -0.005em;
+}
+
+.wipe-tabs__cta { justify-self: end; align-self: end; color: #fff; }
+
+/* --------------------------------------------------------------------------
+   CITA A SANGRE
+   Imagen fija, texto que sube. El paralaje puro de ERA.
+   -------------------------------------------------------------------------- */
+
+.quote-block {
+  position: relative;
+  min-height: clamp(520px, 84vh, 820px);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+}
+
+.quote-block__bg {
+  position: absolute;
+  inset: -12% 0;
+  z-index: 0;
+  will-change: transform;
+}
+
+.quote-block__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(2, 10, 18, 0.8) 0%, rgba(2, 10, 18, 0.15) 60%, rgba(2, 10, 18, 0.45) 100%);
+}
+
+.quote-block__inner {
+  position: relative;
+  z-index: 2;
+  padding-block: clamp(3rem, 10vh, 7rem);
+}
+
+.quote-block__mark {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  line-height: 0.5;
+  color: #fff;
+  opacity: 0.85;
+  display: block;
+  margin-bottom: 1.4rem;
+}
+
+.quote-block__text {
+  color: #fff;
+  max-width: 22ch;
+}
+
+.quote-block__by { margin-top: 1.8rem; color: rgba(255, 255, 255, 0.72); }
+
+/* --------------------------------------------------------------------------
+   REVELADO EN ARCO
+   El gesto de las paginas 39-43: un panel crema con corona semicircular
+   que sube y cubre la seccion oscura anterior.
+   -------------------------------------------------------------------------- */
+
+.arch {
+  position: relative;
+  border-radius: 50% 50% 0 0 / 18% 18% 0 0;
+  padding-block: clamp(5rem, 14vh, 10rem) var(--section-y);
+  margin-top: clamp(-9rem, -12vh, -5rem);
+  z-index: 3;
+  overflow: hidden;
+}
+
+.arch__stack {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 0.1rem;
+}
+
+.arch__stack .display { line-height: 0.94; }
+
+/* --------------------------------------------------------------------------
+   GALERIA ESCALONADA
+   Dos piezas a distinta escala que convergen con el scroll (pags. 46-48).
+   -------------------------------------------------------------------------- */
+
+.stagger-gallery {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.6rem);
+  align-items: center;
+}
+
+.stagger-gallery__item { position: relative; overflow: hidden; border-radius: var(--r-sm); }
+
+.stagger-gallery__item:nth-child(1) {
+  grid-column: 2 / span 4;
+  aspect-ratio: 4 / 5;
+  transform: translateY(6%);
+}
+
+.stagger-gallery__item:nth-child(2) {
+  grid-column: 6 / span 5;
+  aspect-ratio: 3 / 4;
+  transform: translateY(-6%);
+}
+
+@media (max-width: 760px) {
+  .stagger-gallery__item:nth-child(1) { grid-column: 1 / span 7; }
+  .stagger-gallery__item:nth-child(2) { grid-column: 6 / span 7; }
+}
+
+/* --------------------------------------------------------------------------
+   BLOQUE CIRUELA A DOS COLUMNAS
+   Las imagenes cruzan la frontera de color (pags. 44-45).
+   -------------------------------------------------------------------------- */
+
+.plum-split {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+@media (min-width: 900px) { .plum-split { grid-template-columns: 0.9fr 1.1fr; } }
+
+.plum-split__panel {
+  position: relative;
+  background: var(--canvas-plum);
+  padding: clamp(2rem, 5vw, 4rem);
+  border-radius: var(--r-md);
+}
+
+/* La imagen sobresale del panel: rompe la caja como en ERA */
+.plum-split__panel .plum-split__figure {
+  margin-top: clamp(-4rem, -8vh, -2rem);
+  margin-bottom: clamp(-4rem, -8vh, -2rem);
+}
+
+.plum-split__figure {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   MARQUESINA
+   -------------------------------------------------------------------------- */
+
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: 0;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding-right: clamp(2rem, 5vw, 4rem);
+  will-change: transform;
+}
+
+.marquee__item {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3.2vw, 2.6rem);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+.marquee__item::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   MOSAICO DE CIFRAS
+   -------------------------------------------------------------------------- */
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border-block: 1px solid var(--hairline);
+}
+
+.figures__cell {
+  background: var(--canvas-night);
+  padding: clamp(1.6rem, 4vw, 2.8rem) 1.2rem;
+  text-align: center;
+  display: grid;
+  gap: 0.45rem;
+  transition: background var(--dur-base) var(--ease-glass);
+}
+
+[data-canvas='powder'] .figures__cell { background: var(--canvas-powder); }
+[data-canvas='cream'] .figures__cell { background: var(--canvas-cream); }
+
+.figures__cell:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+.figures__value {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3.6rem);
+  line-height: 1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   MAPA DE UBICACIONES  (adaptado de la vista aerea con etiquetas)
+   -------------------------------------------------------------------------- */
+
+.locmap {
+  position: relative;
+  min-height: clamp(460px, 78vh, 760px);
+  overflow: hidden;
+}
+
+.locmap__pin {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: 0.35rem;
+  color: #fff;
+  padding-left: 0.85rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.55);
+  transition: border-color var(--dur-base) var(--ease-glass);
+}
+
+.locmap__pin:hover { border-color: var(--bdp-cyan); }
+
+.locmap__pin-name {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.locmap__pin-meta { font-size: 0.62rem; opacity: 0.72; }
+
+/* --------------------------------------------------------------------------
+   PANEL DE VIDRIO A SANGRE (para formularios sobre lienzo oscuro)
+   -------------------------------------------------------------------------- */
+
+.auth-stage {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  align-items: center;
+  padding-block: calc(var(--header-h) + 3rem) 5rem;
+  overflow: hidden;
+}
+
+.auth-grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 940px) { .auth-grid { grid-template-columns: 1.05fr 0.95fr; } }
+
+.auth-aside { display: none; }
+@media (min-width: 940px) { .auth-aside { display: grid; gap: 1.6rem; } }
