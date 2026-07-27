@@ -1,0 +1,128 @@
+/* ==========================================================================
+   TIPOGRAFIA
+
+   La jerarquia de ERA es brutalmente simple y por eso funciona:
+     1. Un Didone monumental, condensado y de altisimo contraste.
+     2. Un script copperplate como contrapunto lirico.
+     3. Un sans diminuto en versalitas con tracking amplisimo para todo
+        lo funcional (etiquetas, navegacion, metadatos).
+   No hay un cuarto nivel. Esa contencion es lo que se lee como lujo.
+   ========================================================================== */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--fg, var(--ink-invert));
+  /* El Didone se estira en vertical para acercarse al condensado de ERA */
+  transform: scaleY(1.06);
+  transform-origin: bottom;
+}
+
+.display--xxl { font-size: clamp(3.4rem, 13vw, 12rem); }
+.display--xl  { font-size: clamp(2.8rem, 9.5vw, 8.5rem); }
+.display--lg  { font-size: clamp(2.3rem, 6.6vw, 5.6rem); }
+.display--md  { font-size: clamp(1.9rem, 4.4vw, 3.6rem); }
+.display--sm  { font-size: clamp(1.4rem, 2.6vw, 2.2rem); }
+
+/* Variante sin versalitas para citas largas */
+.display--sentence {
+  text-transform: none;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+}
+
+.script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1;
+  transform: none;
+}
+
+.script--xl { font-size: clamp(2.6rem, 8vw, 7rem); }
+.script--lg { font-size: clamp(2rem, 5vw, 4.2rem); }
+.script--md { font-size: clamp(1.5rem, 3vw, 2.6rem); }
+
+/* Etiqueta: la unidad funcional del sistema */
+.label {
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-soft, var(--ink-invert-soft));
+  line-height: 1.5;
+}
+
+.label--accent { color: var(--accent, var(--bdp-cyan)); }
+.label--tiny { font-size: 0.58rem; letter-spacing: 0.3em; }
+
+/* Etiqueta con filete inicial, como los eyebrows de ERA */
+.label--rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.label--rule::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.lede {
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.75;
+  color: var(--fg-soft, var(--ink-invert-soft));
+  max-width: 56ch;
+}
+
+.lede--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.body-text {
+  color: var(--fg-soft, var(--ink-invert-soft));
+  max-width: 68ch;
+}
+
+.numeral {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   Primitivas de revelado tipografico.
+   El JS parte el texto y anima estas piezas. El CSS solo define el estado
+   de reposo para que, si el JS falla, el texto siga siendo legible.
+   -------------------------------------------------------------------------- */
+
+.split-line {
+  display: block;
+  overflow: hidden;
+}
+
+.split-char,
+.split-word {
+  display: inline-block;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* El estado inicial solo se aplica cuando el motor tomo el control */
+[data-split-ready='true'] .split-char,
+[data-split-ready='true'] .split-word {
+  opacity: 0;
+}
+
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }
